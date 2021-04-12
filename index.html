@@ -1,3 +1,9 @@
+<?php  
+
+ $conn = mysqli_connect('localhost','root','','test');
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,27 +14,67 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
+ <h3 class="mt-4 text-center text-secondary">Loading Bar in Jquery PHP</h3>
   <div class="row">
-    <div class="col-sm-4">
-      <h3>Column 1</h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-      <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+    <div class="col-sm-3">
+      <h5 class="mt-4">Select State list</h5>
+       <select name="" id="stateName" class="form-control mt-3">
+        <?php 
+              $sql = "SELECT * FROM loading_bar";
+              $query = mysqli_query($conn,$sql);
+              while($row=mysqli_fetch_assoc($query))
+              {
+                echo '<option value="'.$row['id'].'">'.$row["state_name"].'</option>';
+              }
+        ?>
+       </select>
     </div>
-    <div class="col-sm-4">
-      <h3>Column 2</h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-      <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+    <div class="col-sm-4 offset-sm-1">
+      <h5 class="mt-4 ">State Details</h5>
+        <p id="loading" style="display:none">
+           <i class="fa fa-spinner fa-spin fa-3x fa-fw text-secondary"></i><span class="sr-only">Loading...</span>
+        </p>
+        <div class="p-2 text-secondary" id="stateDetail" style="display:none;border: 1px solid #000000;"  >
+         
+        </div>
     </div>
-    <div class="col-sm-4">
-      <h3>Column 3</h3>        
-      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-      <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
-    </div>
+  
   </div>
 </div>
 
 </body>
 </html>
+
+<script>
+  $(document).ready(function(){
+    $('#stateName').change(function(){
+      var state = $('#stateName').val();
+      
+       $.ajax({
+          url:'fetch.php',
+          type:'post',
+          data:{stateID:state},
+          dataType:'json',
+          success:function(response)
+          {
+             $('#loading').css('display','block');
+         
+             $.each(response, function(key,value) 
+               {
+                $('#stateDetail').css('display','none'); 
+                setTimeout(function()
+                  { 
+                    $('#stateDetail').css('display','block').text(value.state_detail);
+                    $('#loading').css('display','none');
+               },3000);
+              
+             });
+          }
+       });
+    });
+  });
+</script>
